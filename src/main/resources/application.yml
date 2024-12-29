@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: originalgateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: false
+      routes:
+        - id: id1
+          uri: http://localhost:8081
+          predicates:
+              - Path=/id1/**
+          filters:
+              - StripPrefix=1
+        - id: id2
+          uri: http://localhost:8082
+          predicates:
+              - Path=/id2/**
+          filters:
+              - StripPrefix=1
+        - id: loadbalanceRoute
+          uri: "http://localhost:8083"  # 默认 uri
+          predicates:
+            - Path=/loadbalance/**
+          filters:
+            # - StripPrefix=1  # 如果你想移除前缀，可以保留这行
+            - name: Cust
+              args: {}
+    loadbalancer:
+      enabled: true
+      
+server:
+  port: 7070
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
